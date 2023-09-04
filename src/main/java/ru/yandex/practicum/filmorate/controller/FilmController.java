@@ -3,11 +3,17 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.dao.FilmRepository;
 import ru.yandex.practicum.filmorate.model.Film;
+
 import javax.validation.Valid;
 import java.util.List;
+
 @RestController
 @Slf4j
 public class FilmController {
@@ -25,7 +31,7 @@ public class FilmController {
     }
 
     @PutMapping(value = "/films")
-    public ResponseEntity<Film> update(@Valid  @RequestBody Film newFilm) {
+    public ResponseEntity<Film> update(@Valid @RequestBody Film newFilm) {
         log.debug("Вызов put метода у объекта films");
         if (filmRepository.hasKeyInRepository(newFilm.getId())) {
             log.debug("Обновление объекта film в репозитории");

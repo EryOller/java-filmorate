@@ -11,10 +11,12 @@ import java.lang.annotation.Target;
 
 @Documented
 @Constraint(validatedBy = RealiseDateValidator.class)
-@Target( { ElementType.METHOD, ElementType.FIELD })
+@Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RealiseDateConstraint {
     String message() default "Film realise must be after 28 December 1895";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

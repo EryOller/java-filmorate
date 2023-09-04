@@ -20,7 +20,7 @@ public class UserController {
     private final UserRepository userRepository = new UserRepository();
 
     @PostMapping(path = "/users")
-    public ResponseEntity<User> create( @Valid @RequestBody User newUser) {
+    public ResponseEntity<User> create(@Valid @RequestBody User newUser) {
         log.debug("Вызов post метода у объекта users");
         if (!userRepository.getUsers().contains(newUser)) {
             log.debug("Сохранение объекта user в репозиторий");

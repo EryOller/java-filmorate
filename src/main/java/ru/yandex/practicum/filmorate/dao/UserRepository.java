@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class UserRepository {
     protected Map<Integer, User> users = new HashMap<>();
-    private static int sequence = 1 ;
+    private static int sequence = 1;
 
 
     public User save(User user) {
@@ -22,7 +22,7 @@ public class UserRepository {
     }
 
     public User update(User user) {
-            users.put(user.getId(), user);
+        users.put(user.getId(), user);
         return user;
     }
 
