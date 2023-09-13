@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
-    private final static Map<Long, User> storage = new HashMap<>();
+    private static final Map<Long, User> storage = new HashMap<>();
     protected static Long sequence = 1L;
 
     @Override
