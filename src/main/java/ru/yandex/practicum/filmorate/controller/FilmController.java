@@ -95,7 +95,7 @@ public class FilmController {
             log.debug("Поставил лайк фильму " + film + ". Теперь у фильма " + film.getListLikesByUsers().size());
             log.info("Фильму с id " + id + " поставил лайк полькозатель с id " + userId);
         } else {
-            log.debug("Фильм с id " + id + " или  пользователь" + userId+ " не найден");
+            log.debug("Фильм с id " + id + " или  пользователь" + userId + " не найден");
             throw new ObjectNotFoundException("Фильм или пользователь с идентификатором " + id + " не найден");
         }
     }
@@ -113,7 +113,7 @@ public class FilmController {
             filmService.removeLike(film, user);
             log.info("Фильму с id " + id + " поставил лайк полькозатель с id " + userId);
         } else {
-            log.debug("Фильм с id " + id + " или  пользователь" + userId+ " не найден");
+            log.debug("Фильм с id " + id + " или  пользователь" + userId + " не найден");
             throw new ObjectNotFoundException("Фильм или пользователь с идентификатором " + id + " не найден");
         }
     }
