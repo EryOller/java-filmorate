@@ -135,11 +135,11 @@ public class UserController {
         if (isContainsUserIdInStorage && isContainsFriendIdInStorage) {
             User initiator = userStorage.getUserFromStorageById(Long.valueOf(userId));
             User permissive = userStorage.getUserFromStorageById(Long.valueOf(otherId));
-            List <User> listOfCommonFriends = userService.getListCommonFriends(initiator, permissive);
+            List<User> listOfCommonFriends = userService.getListCommonFriends(initiator, permissive);
             log.info("Пользователи с id " + userId + " и " + otherId +  " больше не друзья");
             return new ResponseEntity<>(listOfCommonFriends, HttpStatus.OK);
         } else {
-            log.debug("Пользователь с id " + userId + " или " + otherId+ " отсутствует");
+            log.debug("Пользователь с id " + userId + " или " + otherId + " отсутствует");
             throw new ObjectNotFoundException("Пользователь с идентификатором " + userId + " или "
                     + otherId + " не найден");
         }
