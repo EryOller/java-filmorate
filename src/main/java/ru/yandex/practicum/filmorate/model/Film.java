@@ -10,11 +10,13 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Data
 public class Film {
-    private int id;
+    private Long id;
     @NotBlank(message = "Передано название фильма из пробелов")
     @NotEmpty(message = "Передано пустое название фильма")
     @NonNull
@@ -26,6 +28,7 @@ public class Film {
     @NonNull
     @Positive(message = "Продолжительность фильма может быть только положительным значением")
     private int duration;
+    private Set<Long> likesByUsers =  new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
@@ -38,6 +41,10 @@ public class Film {
     @Override
     public int hashCode() {
         return Objects.hash(name);
+    }
+
+    public Set<Long> getListLikesByUsers() {
+        return likesByUsers;
     }
 
 }

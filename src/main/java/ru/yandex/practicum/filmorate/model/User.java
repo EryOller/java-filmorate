@@ -7,11 +7,13 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Data
 public class User {
-    private int id;
+    private Long id;
     @NonNull
     @Email(message = "Почта должна соотвествовать структуре написанию электронного почтового адреса")
     private String email;
@@ -22,6 +24,7 @@ public class User {
     @NonNull
     @Past(message = "День рождения не может быть в будущем")
     private LocalDate birthday;
+    private Set<Long> friends =  new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
@@ -34,5 +37,9 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(email, login);
+    }
+
+    public Set<Long> getListFriends() {
+        return friends;
     }
 }
