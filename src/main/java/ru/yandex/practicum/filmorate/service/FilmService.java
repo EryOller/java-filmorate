@@ -14,6 +14,7 @@ public class FilmService {
     public void putLike(Film film, User user) {
         film.getListLikesByUsers().add(user.getId());
     }
+
     public void removeLike(Film film, User user) {
         film.getLikesByUsers().remove(user.getId());
     }

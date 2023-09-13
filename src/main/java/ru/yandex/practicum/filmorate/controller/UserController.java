@@ -95,7 +95,7 @@ public class UserController {
             User initiator = userStorage.getUserFromStorageById(Long.valueOf(userId));
             User permissive = userStorage.getUserFromStorageById(Long.valueOf(friendId));
             userService.breakOffFriendship(initiator, permissive);
-            log.info("Пользователи с id " + userId + " и " + friendId +  " больше не друзья");
+            log.info("Пользователи с id " + userId + " и " + friendId + " больше не друзья");
         } else {
             log.debug("Пользователь с id " + userId + " или " + friendId + " отсутствует");
             throw new ObjectNotFoundException("Пользователь с идентификатором " + userId + " или "
@@ -107,7 +107,7 @@ public class UserController {
     public ResponseEntity<User> getUser(@PathVariable String id) {
         log.debug("Вызов get метода для получения пользователя по идентификатору");
         if (userStorage.hasKeyInStorage(Long.valueOf(id))) {
-            User user =  userStorage.getUserFromStorageById(Long.valueOf(id));
+            User user = userStorage.getUserFromStorageById(Long.valueOf(id));
             return new ResponseEntity<>(user, HttpStatus.OK);
         } else {
             throw new ObjectNotFoundException("Пользователь с идентификатором " + id + " не найден");
@@ -136,7 +136,7 @@ public class UserController {
             User initiator = userStorage.getUserFromStorageById(Long.valueOf(userId));
             User permissive = userStorage.getUserFromStorageById(Long.valueOf(otherId));
             List<User> listOfCommonFriends = userService.getListCommonFriends(initiator, permissive);
-            log.info("Пользователи с id " + userId + " и " + otherId +  " больше не друзья");
+            log.info("Пользователи с id " + userId + " и " + otherId + " больше не друзья");
             return new ResponseEntity<>(listOfCommonFriends, HttpStatus.OK);
         } else {
             log.debug("Пользователь с id " + userId + " или " + otherId + " отсутствует");

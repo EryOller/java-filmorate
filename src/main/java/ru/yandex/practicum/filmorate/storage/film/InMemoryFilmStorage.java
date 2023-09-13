@@ -12,6 +12,7 @@ import java.util.Map;
 public class InMemoryFilmStorage implements FilmStorage {
     private final static Map<Long, Film> storage = new HashMap<>();
     private static Long sequence = 1L;
+
     @Override
     public Film save(Film film) {
         film.setId(sequence++);

@@ -28,7 +28,7 @@ public class Film {
     @NonNull
     @Positive(message = "Продолжительность фильма может быть только положительным значением")
     private int duration;
-    private Set<Long> likesByUsers =  new HashSet<>();
+    private Set<Long> likesByUsers = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

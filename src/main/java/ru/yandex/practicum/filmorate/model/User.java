@@ -24,7 +24,7 @@ public class User {
     @NonNull
     @Past(message = "День рождения не может быть в будущем")
     private LocalDate birthday;
-    private Set<Long> friends =  new HashSet<>();
+    private Set<Long> friends = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

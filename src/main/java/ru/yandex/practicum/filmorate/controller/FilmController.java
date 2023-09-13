@@ -119,7 +119,7 @@ public class FilmController {
     }
 
     @GetMapping(value = "/films/popular")
-    public ResponseEntity<List<Film>> getTopFilms(@RequestParam(defaultValue = "10")  String count) {
+    public ResponseEntity<List<Film>> getTopFilms(@RequestParam(defaultValue = "10") String count) {
         log.debug("Вызов get метода для получения пользователя по идентификатору");
         List<Film> listPopularFilms = filmService.getTopPopularFilm(Integer.parseInt(count));
         return new ResponseEntity<>(listPopularFilms, HttpStatus.OK);
