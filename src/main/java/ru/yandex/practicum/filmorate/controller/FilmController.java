@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -73,48 +73,46 @@ public class FilmController {
     @GetMapping(value = "/films/{id}")
     public ResponseEntity<Film> getUsers(@PathVariable String id) {
         log.debug("Вызов get метода для получения пользователя по идентификатору");
-        if (filmStorage.hasKeyInStorage(Long.valueOf(id))) {
-            Film film = filmStorage.getFilmFromStorageById(Long.valueOf(id));
+        Film film = filmStorage.getFilmFromStorageById(Long.valueOf(id));
+        if (film != null) {
             return new ResponseEntity<>(film, HttpStatus.OK);
         } else {
-            throw new ObjectNotFoundException("Фильм с идентификатором " + id + " не найден");
+            throw new EntityNotFoundException("Фильм с идентификатором " + id + " не найден");
         }
     }
 
     @PutMapping(value = "/films/{id}/like/{userId}")
     public void putLikeForFilm(@PathVariable Map<String, String> pathVarsMap) {
-        String id = pathVarsMap.get("id");
-        String userId = pathVarsMap.get("userId");
-        boolean isContainsFilmIdInStorage = filmStorage.hasKeyInStorage(Long.valueOf(id));
-        boolean isContainsFriendIdInStorage = userStorage.hasKeyInStorage(Long.valueOf(userId));
+        Film film = filmStorage.getFilmFromStorageById(Long.valueOf(pathVarsMap.get("id")));
+        User user = userStorage.getUserFromStorageById(Long.valueOf(pathVarsMap.get("userId")));
         log.debug("Проверка наличия пользователей в storage");
-        if (isContainsFilmIdInStorage && isContainsFriendIdInStorage) {
-            Film film = filmStorage.getFilmFromStorageById(Long.valueOf(id));
-            User user = userStorage.getUserFromStorageById(Long.valueOf(userId));
+        if ((film != null) && (user != null)) {
             filmService.putLike(film, user);
             log.debug("Поставил лайк фильму " + film + ". Теперь у фильма " + film.getListLikesByUsers().size());
-            log.info("Фильму с id " + id + " поставил лайк полькозатель с id " + userId);
+            log.info("Фильму с id " + pathVarsMap.get("id") + " поставил лайк полькозатель с id "
+                    + pathVarsMap.get("userId"));
         } else {
-            log.debug("Фильм с id " + id + " или  пользователь" + userId + " не найден");
-            throw new ObjectNotFoundException("Фильм или пользователь с идентификатором " + id + " не найден");
+            log.debug("Фильм с id " + pathVarsMap.get("id") + " или  пользователь" + pathVarsMap.get("userId")
+                    + " не найден");
+            throw new EntityNotFoundException("Фильм или пользователь с идентификатором "
+                    + pathVarsMap.get("id") + " не найден");
         }
     }
 
     @DeleteMapping(value = "/films/{id}/like/{userId}")
     public void removeFromFriend(@PathVariable Map<String, String> pathVarsMap) {
-        String id = pathVarsMap.get("id");
-        String userId = pathVarsMap.get("userId");
-        boolean isContainsFilmIdInStorage = filmStorage.hasKeyInStorage(Long.valueOf(id));
-        boolean isContainsFriendIdInStorage = userStorage.hasKeyInStorage(Long.valueOf(userId));
+        Film film = filmStorage.getFilmFromStorageById(Long.valueOf(pathVarsMap.get("id")));
+        User user = userStorage.getUserFromStorageById(Long.valueOf(pathVarsMap.get("userId")));
         log.debug("Проверка наличия пользователей в storage");
-        if (isContainsFilmIdInStorage && isContainsFriendIdInStorage) {
-            Film film = filmStorage.getFilmFromStorageById(Long.valueOf(id));
-            User user = userStorage.getUserFromStorageById(Long.valueOf(userId));
+        if ((film != null) && (user != null)) {
             filmService.removeLike(film, user);
-            log.info("Фильму с id " + id + " поставил лайк полькозатель с id " + userId);
+            log.info("Фильму с id " + pathVarsMap.get("id") + " поставил лайк полькозатель с id "
+                    + pathVarsMap.get("userId"));
         } else {
-            log.debug("Фильм с id " + id + " или  пользователь" + userId + " не найден");
-            throw new ObjectNotFoundException("Фильм или пользователь с идентификатором " + id + " не найден");
+            log.debug("Фильм с id " + pathVarsMap.get("id") + " или  пользователь"
+                    + pathVarsMap.get("userId") + " не найден");
+            throw new EntityNotFoundException("Фильм или пользователь с идентификатором "
+                    + pathVarsMap.get("id") + " не найден");
         }
     }
 
