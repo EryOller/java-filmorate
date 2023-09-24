@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 public class UserRepository {
-    protected Map<Integer, User> users = new HashMap<>();
-    private static int sequence = 1;
+    protected Map<Long, User> users = new HashMap<>();
+    private static Long sequence = 1L;
 
 
     public User save(User user) {
@@ -30,7 +30,7 @@ public class UserRepository {
         return new ArrayList<>(users.values());
     }
 
-    public boolean hasKeyInRepository(int id) {
+    public boolean hasKeyInRepository(Long id) {
         return users.containsKey(id);
     }
 }

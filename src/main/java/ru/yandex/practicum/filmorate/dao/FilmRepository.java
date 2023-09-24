@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 public class FilmRepository {
-    protected Map<Integer, Film> films = new HashMap<>();
-    private static int sequence = 1;
+    protected Map<Long, Film> films = new HashMap<>();
+    private static Long sequence = 1L;
 
 
     public Film save(Film film) {
@@ -27,7 +27,7 @@ public class FilmRepository {
         return new ArrayList<>(films.values());
     }
 
-    public boolean hasKeyInRepository(int id) {
+    public boolean hasKeyInRepository(Long id) {
         return films.containsKey(id);
     }
 }
