@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.model.user;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -24,7 +24,7 @@ public class User {
     @NonNull
     @Past(message = "День рождения не может быть в будущем")
     private LocalDate birthday;
-    private Set<Long> friends = new HashSet<>();
+    private Set<Friendship> friends = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
@@ -39,7 +39,7 @@ public class User {
         return Objects.hash(email, login);
     }
 
-    public Set<Long> getListFriends() {
+    public Set<Friendship> getListFriends() {
         return friends;
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.user.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -111,7 +111,8 @@ public class UserController {
     public ResponseEntity<List<User>> getListFriendsByUserId(@PathVariable String id) {
         log.debug("Вызов get метода для получения списка друзей");
         if (userStorage.hasKeyInStorage(Long.valueOf(id))) {
-            List<User> friends = userService.getListFriends(userStorage.getUserFromStorageById(Long.valueOf(id)));
+            List<User> friends = userService.getListFriends(userStorage.getUserFromStorageById(Long.valueOf(id)),
+                    userStorage);
             return new ResponseEntity<>(friends, HttpStatus.OK);
         } else {
             throw new EntityNotFoundException("Пользователь с идентификатором " + id + " не найден");
@@ -124,7 +125,7 @@ public class UserController {
         User permissive = userStorage.getUserFromStorageById(Long.valueOf(pathVarsMap.get("otherId")));
         log.debug("Проверка наличия пользователей в storage");
         if ((initiator != null) && (permissive != null)) {
-            List<User> listOfCommonFriends = userService.getListCommonFriends(initiator, permissive);
+            List<User> listOfCommonFriends = userService.getListCommonFriends(initiator, permissive, userStorage);
             log.info("Пользователи с id " + pathVarsMap.get("id") + " и " + pathVarsMap.get("otherId") + " больше не друзья");
             return new ResponseEntity<>(listOfCommonFriends, HttpStatus.OK);
         } else {

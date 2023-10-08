@@ -1,9 +1,9 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.model.film.Film;
+import ru.yandex.practicum.filmorate.model.user.User;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,8 +19,8 @@ public class FilmService {
         film.getLikesByUsers().remove(user.getId());
     }
 
-    public List<Film> getTopPopularFilm(int top) {
-        return  InMemoryFilmStorage.getStorage().values().stream()
+    public List<Film> getTopPopularFilm(int top, FilmStorage storage) {
+        return  storage.getFilms().stream()
                 .sorted((f1, f2) -> f2.getListLikesByUsers().size() - f1.getListLikesByUsers().size())
                 .limit(top)
                 .collect(Collectors.toList());

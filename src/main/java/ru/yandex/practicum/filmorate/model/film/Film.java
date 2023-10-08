@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.model.film;
 
 
 import lombok.Data;
@@ -11,6 +11,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -29,6 +30,8 @@ public class Film {
     @Positive(message = "Продолжительность фильма может быть только положительным значением")
     private int duration;
     private Set<Long> likesByUsers = new HashSet<>();
+    private List<Genre> genres;
+    private MotionPictureAssociation mpa;
 
     @Override
     public boolean equals(Object o) {

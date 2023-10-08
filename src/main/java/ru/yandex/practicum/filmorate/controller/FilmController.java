@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.film.Film;
+import ru.yandex.practicum.filmorate.model.user.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -119,7 +119,7 @@ public class FilmController {
     @GetMapping(value = "/films/popular")
     public ResponseEntity<List<Film>> getTopFilms(@RequestParam(defaultValue = "10") String count) {
         log.debug("Вызов get метода для получения пользователя по идентификатору");
-        List<Film> listPopularFilms = filmService.getTopPopularFilm(Integer.parseInt(count));
+        List<Film> listPopularFilms = filmService.getTopPopularFilm(Integer.parseInt(count), filmStorage);
         return new ResponseEntity<>(listPopularFilms, HttpStatus.OK);
     }
 }
