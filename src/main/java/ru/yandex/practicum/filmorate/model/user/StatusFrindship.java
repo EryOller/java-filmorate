@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum StatusFrindship {
-    CONFIRMED("Подтвержденная"),
-    UNCONFIRMED("Неподтвержденная");
+    CONFIRMED("подтвержденная"),
+    UNCONFIRMED("неподтвержденная");
 
     private String status;
 

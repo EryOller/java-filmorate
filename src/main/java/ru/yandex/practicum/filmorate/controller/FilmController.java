@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,24 +15,31 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Film;
+import ru.yandex.practicum.filmorate.model.film.Genre;
+import ru.yandex.practicum.filmorate.model.film.MotionPictureAssociation;
 import ru.yandex.practicum.filmorate.model.user.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Map;
+
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.*;
 
 @RestController
 @Slf4j
 public class FilmController {
+
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final FilmService filmService;
 
+
     @Autowired
-    public FilmController(FilmStorage filmStorage, UserStorage userStorage, FilmService filmService) {
+    public FilmController( @Qualifier("filmDbStorage") FilmStorage filmStorage,  @Qualifier("userDbStorage") UserStorage userStorage, FilmService filmService) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.filmService = filmService;
@@ -64,14 +72,14 @@ public class FilmController {
     }
 
     @GetMapping(value = "/films")
-    public ResponseEntity<List<Film>> getAllFilms() {
+    public ResponseEntity<List<Film>> getAllFilms() throws SQLException {
         log.debug("Вызов get метода у объекта films");
         List<Film> films = filmStorage.getFilms();
         return new ResponseEntity<>(films, HttpStatus.OK);
     }
 
     @GetMapping(value = "/films/{id}")
-    public ResponseEntity<Film> getUsers(@PathVariable String id) {
+    public ResponseEntity<Film> getUsers(@PathVariable String id) throws SQLException {
         log.debug("Вызов get метода для получения пользователя по идентификатору");
         Film film = filmStorage.getFilmFromStorageById(Long.valueOf(id));
         if (film != null) {
@@ -82,7 +90,7 @@ public class FilmController {
     }
 
     @PutMapping(value = "/films/{id}/like/{userId}")
-    public void putLikeForFilm(@PathVariable Map<String, String> pathVarsMap) {
+    public void putLikeForFilm(@PathVariable Map<String, String> pathVarsMap) throws SQLException {
         Film film = filmStorage.getFilmFromStorageById(Long.valueOf(pathVarsMap.get("id")));
         User user = userStorage.getUserFromStorageById(Long.valueOf(pathVarsMap.get("userId")));
         log.debug("Проверка наличия пользователей в storage");
@@ -100,7 +108,7 @@ public class FilmController {
     }
 
     @DeleteMapping(value = "/films/{id}/like/{userId}")
-    public void removeFromFriend(@PathVariable Map<String, String> pathVarsMap) {
+    public void removeFromFriend(@PathVariable Map<String, String> pathVarsMap) throws SQLException {
         Film film = filmStorage.getFilmFromStorageById(Long.valueOf(pathVarsMap.get("id")));
         User user = userStorage.getUserFromStorageById(Long.valueOf(pathVarsMap.get("userId")));
         log.debug("Проверка наличия пользователей в storage");

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import ru.yandex.practicum.filmorate.model.film.Film;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface FilmStorage {
@@ -13,5 +14,5 @@ public interface FilmStorage {
 
     boolean hasKeyInStorage(Long id);
 
-    Film getFilmFromStorageById(Long id);
+    Film getFilmFromStorageById(Long id) throws SQLException;
 }

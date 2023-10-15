@@ -30,7 +30,7 @@ public class Film {
     @Positive(message = "Продолжительность фильма может быть только положительным значением")
     private int duration;
     private Set<Long> likesByUsers = new HashSet<>();
-    private List<Genre> genres;
+    private Set<Genre> genres;
     private MotionPictureAssociation mpa;
 
     @Override
