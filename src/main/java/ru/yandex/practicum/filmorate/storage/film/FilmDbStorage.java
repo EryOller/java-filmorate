@@ -64,7 +64,7 @@ public class FilmDbStorage implements FilmStorage {
         final String sqlMpaId = "SELECT mpa_id FROM mpa WHERE name = :mpa";
         final String sqlUpdateFilmFieldName = "UPDATE films SET name = :name " +
                 "WHERE film_id = :filmId;";
-        final String sqlUpdateFilmFieldDescriprion = "UPDATE films SET description = :description" +
+        final String sqlUpdateFilmFieldDescriprion = "UPDATE films SET description = :description " +
                 "WHERE film_id = :filmId;";
         final String sqlUpdateFilmFieldReleaseDate = "UPDATE films SET release_date = :releaseDate " +
                 "WHERE film_id = :filmId;";
@@ -142,8 +142,8 @@ public class FilmDbStorage implements FilmStorage {
 
         final String sqlGetFilmById = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration," +
                 "m.name mpa " +
-                "FROM films AS f LEFT OUTER JOIN mpa AS m ON f.mpa_id = m.mpa_id" +
-                "HAVING f.film_id = :filmId;";
+                "FROM films AS f LEFT OUTER JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
+                "WHERE f.film_id = :filmId;";
         final String sqlGetLikesByFilmId = "SELECT user_id FROM likes WHERE film_id = :filmId;";
 
         SqlRowSet filmRows = namedParameterJdbcOperations.queryForRowSet(sqlGetFilmById, Map.of("filmId", id));
@@ -158,11 +158,11 @@ public class FilmDbStorage implements FilmStorage {
         Film film;
         List<Film> films = new ArrayList<>();
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.d");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-d");
         while (filmResultSet.next()) {
             film = new Film(filmResultSet.getString("NAME"), filmResultSet.getInt("DURATION"));
             film.setId(filmResultSet.getLong("FILM_ID"));
-            film.setName(filmResultSet.getString("DESCRIPTION"));
+            film.setDescription(filmResultSet.getString("DESCRIPTION"));
             film.setReleaseDate(LocalDate.parse(filmResultSet.getString("RELEASE_DATE"), formatter));
             film.setMpa(
                     Arrays.stream(MotionPictureAssociation.values())
@@ -175,7 +175,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private static Set<Long> makeLikes(SqlRowSet likesByFilmResultSet) {
-        Set<Long> likesfilm = null;
+        Set<Long> likesfilm = new HashSet<>();
         while (likesByFilmResultSet.next()) {
             likesfilm.add(likesByFilmResultSet.getLong("USER_ID"));
         }

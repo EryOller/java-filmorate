@@ -54,26 +54,24 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User update(User user) {
         final String sqlUpdateUserFieldLogin = "UPDATE users SET login = :login " +
-                "WHERE user_id = userId;";
-        final String sqlUpdateUserFieldName = "UPDATE users SET name = :name" +
+                "WHERE user_id = :userId;";
+        final String sqlUpdateUserFieldName = "UPDATE users SET name = :name " +
                 "WHERE user_id = :userId;";
         final String sqlUpdateUserFieldEmail = "UPDATE users SET email = :email " +
-                "WHERE user_id = userId;";
+                "WHERE user_id = :userId;";
         final String sqlUpdateFilmFieldDuration = "UPDATE users SET birthday = :birthday " +
-                "WHERE user_id = userId;";
+                "WHERE user_id = :userId;";
         final String sqlDeleteFriendsByUserId = "DELETE FROM friends WHERE user_id = :userId;";
         final String sqlFriendshipId = "SELECT friendship_id FROM friendship WHERE status = :status;";
         // Заполнение таблицу с друзьями пользователя
-        final String sqlFriends = "INSERT INTO friends (user_id, friends_id, friendship_id) " +
+        final String sqlFriends = "INSERT INTO friends (user_id, friend_id, friendship_id) " +
                 "VALUES (:userId, :friend_Id, :friendshipId);";
         namedParameterJdbcOperations.update(sqlUpdateUserFieldLogin,
                 Map.of("login", user.getLogin(), "userId", user.getId()));
         namedParameterJdbcOperations.update(sqlUpdateUserFieldName,
-                Map.of("name", user.getName(),
-                        "userId", user.getId()));
+                Map.of("name", user.getName(), "userId", user.getId()));
         namedParameterJdbcOperations.update(sqlUpdateUserFieldEmail,
-                Map.of("releaseDate", user.getEmail(),
-                        "userId", user.getId()));
+                Map.of("email", user.getEmail(), "userId", user.getId()));
         namedParameterJdbcOperations.update(sqlUpdateFilmFieldDuration, Map.of("birthday", user.getBirthday(),
                 "userId", user.getId()));
         namedParameterJdbcOperations.update(sqlDeleteFriendsByUserId, Map.of("userId", user.getId()));
@@ -99,7 +97,7 @@ public class UserDbStorage implements UserStorage {
         final String sqlGetUsers = "SELECT user_id, login, name, email, birthday FROM users";
         final String sqlGetFriendsByUserId = "SELECT f.friend_id, fs.status " +
                 "FROM friends AS f LEFT OUTER JOIN friendship AS fs ON f.friendship_id = fs.friendship_id " +
-                "HAVING user_id = :userId;";
+                "WHERE user_id = :userId;";
         SqlRowSet usersRows = jdbcTemplate.queryForRowSet(sqlGetUsers);
         users = makeListUsers(usersRows);
         for (User user : users) {
@@ -120,14 +118,14 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User getUserFromStorageById(Long id) {
         User user = null;
-        final String sqlGetUserById = "SELECT login, name, email, birthday" +
+        final String sqlGetUserById = "SELECT user_id, login, name, email, birthday " +
                 "FROM users WHERE user_id = :userId;";
         final String sqlGetFriendsByUserId = "SELECT f.friend_id, fs.status FROM friends AS f " +
                 "LEFT OUTER JOIN friendship AS fs ON f.friendship_id = fs.friendship_id " +
-                "HAVING user_id = :userId;";
+                "WHERE user_id = :userId;";
 
         SqlRowSet userRows = namedParameterJdbcOperations.queryForRowSet(sqlGetUserById, Map.of("userId", id));
-        SqlRowSet friendsUserByUserId = namedParameterJdbcOperations.queryForRowSet(sqlGetFriendsByUserId, Map.of("userId", user.getId()));
+        SqlRowSet friendsUserByUserId = namedParameterJdbcOperations.queryForRowSet(sqlGetFriendsByUserId, Map.of("userId", id));
 
         List<User> users = makeListUsers(userRows);
         user = users.get(users.size() - 1);
@@ -139,7 +137,7 @@ public class UserDbStorage implements UserStorage {
         User user;
         List<User> users = new ArrayList<>();
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.d");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-d");
         while (userResultSet.next()) {
             user = new User(userResultSet.getString("EMAIL"), userResultSet.getString("LOGIN"),
                     LocalDate.parse(userResultSet.getString("BIRTHDAY"), formatter));
@@ -151,7 +149,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     private static Set<Friendship> makeFriends(SqlRowSet friendsByUserResultSet, User user) {
-        Set<Friendship> friends = null;
+        Set<Friendship> friends = new HashSet<>();
         while (friendsByUserResultSet.next()) {
             friends.add(new Friendship(friendsByUserResultSet.getLong("FRIEND_ID"),
                     Arrays.stream(StatusFrindship.values())
