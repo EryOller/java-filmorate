@@ -11,7 +11,6 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -31,7 +30,8 @@ public class Film {
     private int duration;
     private Set<Long> likesByUsers = new HashSet<>();
     private Set<Genre> genres;
-    private MotionPictureAssociation mpa;
+    private Mpa mpa;
+
 
     @Override
     public boolean equals(Object o) {

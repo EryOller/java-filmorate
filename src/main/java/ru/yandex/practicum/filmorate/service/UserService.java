@@ -9,12 +9,13 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-
     private static final String CREATE_FRIENDSHIP = "Create friendship";
     private static final String BREAK_OFF_FRIENDSHIP = "Break off friendship";
+
 
     public void makeFriends(User initiator, User permissive) {
         if (changeStatusFriendshipPermissive(initiator, permissive, CREATE_FRIENDSHIP)) {
@@ -35,13 +36,11 @@ public class UserService {
     public List<User> getListCommonFriends(User initiator, User permissive, UserStorage storage) {
         List<User> friendsList = new ArrayList<>();
         for (Friendship friend : initiator.getListFriends()) {
-            if (StatusFrindship.CONFIRMED.equals(friend.getStatus())) {
-                if (permissive.getListFriends().contains(friend)) {
-                    storage.getUsers().stream()
-                            .filter(u -> u.getId() == friend.getUser())
-                            .findFirst()
-                            .map(u -> friendsList.add(u));
-                }
+            if (permissive.getListFriends().contains(friend)) {
+                storage.getUsers().stream()
+                        .filter(u -> u.getId() == friend.getUser())
+                        .findFirst()
+                        .map(u -> friendsList.add(u));
             }
         }
         return friendsList;
@@ -50,14 +49,22 @@ public class UserService {
     public List<User> getListFriends(User user, UserStorage storage) {
         List<User> friendsList = new ArrayList<>();
         for (Friendship friend : user.getListFriends() ) {
-            if (StatusFrindship.CONFIRMED.equals(friend.getStatus())) {
-                storage.getUsers().stream()
-                        .filter(u -> u.getId() == friend.getUser())
-                        .findFirst()
-                        .map(u -> friendsList.add(u));
-            }
+            storage.getUsers().stream()
+                    .filter(u -> u.getId() == friend.getUser())
+                    .findFirst()
+                    .map(u -> friendsList.add(u));
         }
-        return friendsList;
+        return friendsList.stream().sorted((u1, u2) -> {
+             if (u2.getId() - u1.getId() < 0) {
+                 return 1;
+             } else if (u2.getId() - u1.getId() > 0) {
+                 return -1;
+             } else {
+                 return 0;
+             }
+        }
+                )
+                .collect(Collectors.toList());
     }
 
     private boolean changeStatusFriendshipPermissive(User initiator, User permissive, String actionForFriendship) {

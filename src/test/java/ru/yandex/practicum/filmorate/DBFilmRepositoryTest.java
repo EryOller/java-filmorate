@@ -7,12 +7,9 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.model.film.Genre;
-import ru.yandex.practicum.filmorate.model.film.MotionPictureAssociation;
-import ru.yandex.practicum.filmorate.model.user.Friendship;
-import ru.yandex.practicum.filmorate.model.user.StatusFrindship;
-import ru.yandex.practicum.filmorate.model.user.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -26,6 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @RequiredArgsConstructor(onConstructor_= @Autowired)
 public class DBFilmRepositoryTest {
     private final FilmDbStorage filmStorage;
+    private final GenreDbStorage genreDbStorage;
+    private final MpaDbStorage mpaDbStorage;
 
     @Test
     public void testFindFilmById() {
@@ -49,11 +48,11 @@ public class DBFilmRepositoryTest {
         Film film = new Film("Выжить любой ценой", 4000);
         film.setDescription("Выжить в Сибире");
         Set<Genre> genres = new HashSet<>();
-        genres.add(Genre.DOCUMENTARY);
-        genres.add(Genre.COMEDY);
+        genres.add(genreDbStorage.getGenreFromStorageById(1));
+        genres.add(genreDbStorage.getGenreFromStorageById(2));
         film.setGenres(genres);
         film.setReleaseDate(LocalDate.of(2011,01,01));
-        film.setMpa(MotionPictureAssociation.NC17);
+        film.setMpa(mpaDbStorage.getMpaFromStorageById(1));
         Set<Long> likes = new HashSet<>();
         likes.add(1L);
         likes.add(2L);
@@ -74,11 +73,11 @@ public class DBFilmRepositoryTest {
         Film film = new Film("ТОП ГИР", 4000);
         film.setDescription("Гонка леман");
         Set<Genre> genres = new HashSet<>();
-        genres.add(Genre.DOCUMENTARY);
-        genres.add(Genre.ACTION);
+        genres.add(genreDbStorage.getGenreFromStorageById(3));
+        genres.add(genreDbStorage.getGenreFromStorageById(4));
         film.setGenres(genres);
         film.setReleaseDate(LocalDate.of(2011,01,01));
-        film.setMpa(MotionPictureAssociation.NC17);
+        film.setMpa(mpaDbStorage.getMpaFromStorageById(2));
         Set<Long> likes = new HashSet<>();
         likes.add(1L);
         likes.add(2L);

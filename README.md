@@ -20,14 +20,14 @@
 - SELECT f.name AS Фильмы, m.name AS Ограничение
   FROM films AS f
   INNER JOIN mpa AS m ON f.mpa_id = m.mpa.id
-  HAVING m.name = 'NC-17';
+  WHERE m.name = 'NC-17';
 
 *Узнать количество лайков у фильма Аватар*
 - SELECT f.name AS Фильм, COUNT(l.user_id) AS Лайки
   FROM films AS f
   INNER JOIN likes AS l ON f.film_id=l.film_id
   GROUP BY f.film_id
-  HAVING f.name = 'Аватар';
+  WHERE f.name = 'Аватар';
 
 *Посмотреть всех друзей у пользователя EryOller*
 -  SELECT *
@@ -37,4 +37,4 @@
    FROM users AS u
    INNER JOIN friends AS f ON u.user_id = f.user_id
    INNER JOUN friendship AS fs f.friendship_id = fs.friendship_id
-   HAVING fs.status = 'подтверждённая' AND u.login = 'EryOller');
+   WHERE fs.status = 'подтверждённая' AND u.login = 'EryOller');

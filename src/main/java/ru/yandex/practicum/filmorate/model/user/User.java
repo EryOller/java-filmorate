@@ -26,6 +26,7 @@ public class User {
     private LocalDate birthday;
     private Set<Friendship> friends = new HashSet<>();
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -26,6 +26,9 @@ public class UserDbStorage implements UserStorage {
     }
     @Override
     public User save(User user) {
+        if (user.getName() == null || "".equals(user.getName())) {
+            user.setName(user.getLogin());
+        }
         final String sqlUser = "INSERT INTO users (login, name, email, birthday) " +
                 "VALUES (:login, :name, :email, :birthday);";
         final String sqlFriendshipId = "SELECT friendship_id FROM friendship WHERE status = :status;";
@@ -75,9 +78,7 @@ public class UserDbStorage implements UserStorage {
         namedParameterJdbcOperations.update(sqlUpdateFilmFieldDuration, Map.of("birthday", user.getBirthday(),
                 "userId", user.getId()));
         namedParameterJdbcOperations.update(sqlDeleteFriendsByUserId, Map.of("userId", user.getId()));
-
         SqlRowSet friendsStatusRows;
-        // SqlRowSet likesRows;
         for (Friendship friendship : user.getListFriends()) {
             friendsStatusRows = namedParameterJdbcOperations.queryForRowSet(sqlFriendshipId,
                     Map.of("status", friendship.getStatus().getStatus()));
