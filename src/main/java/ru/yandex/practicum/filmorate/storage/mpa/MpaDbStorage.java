@@ -20,6 +20,7 @@ public class MpaDbStorage implements MpaStorage {
         this.namedParameterJdbcOperations = namedParameterJdbcOperations;
         this.jdbcTemplate = jdbcTemplate;
     }
+
     @Override
     public List<Mpa> getMpa() {
         List<Mpa> genres;
