@@ -48,7 +48,7 @@ public class UserService {
 
     public List<User> getListFriends(User user, UserStorage storage) {
         List<User> friendsList = new ArrayList<>();
-        for (Friendship friend : user.getListFriends() ) {
+        for (Friendship friend : user.getListFriends()) {
             storage.getUsers().stream()
                     .filter(u -> u.getId() == friend.getUser())
                     .findFirst()
