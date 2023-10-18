@@ -19,7 +19,7 @@ public class MpaController {
 
 
     @Autowired
-    public MpaController (MpaStorage mpaStorage) {
+    public MpaController(MpaStorage mpaStorage) {
         this.mpaStorage = mpaStorage;
     }
 

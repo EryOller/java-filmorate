@@ -19,7 +19,7 @@ public class GenreController {
 
 
     @Autowired
-    public GenreController (GenreStorage genreStorage) {
+    public GenreController(GenreStorage genreStorage) {
         this.genreStorage = genreStorage;
     }
 
