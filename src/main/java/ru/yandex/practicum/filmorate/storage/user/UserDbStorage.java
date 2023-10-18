@@ -20,10 +20,12 @@ public class UserDbStorage implements UserStorage {
 
     private final NamedParameterJdbcOperations namedParameterJdbcOperations;
     private final JdbcTemplate jdbcTemplate;
+
     public UserDbStorage(NamedParameterJdbcOperations namedParameterJdbcOperations, JdbcTemplate jdbcTemplate) {
         this.namedParameterJdbcOperations = namedParameterJdbcOperations;
         this.jdbcTemplate = jdbcTemplate;
     }
+
     @Override
     public User save(User user) {
         if (user.getName() == null || "".equals(user.getName())) {
@@ -93,7 +95,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getUsers() {
         List<User> users;
-        SqlRowSet friendsByUserId ;
+        SqlRowSet friendsByUserId;
 
         final String sqlGetUsers = "SELECT user_id, login, name, email, birthday FROM users";
         final String sqlGetFriendsByUserId = "SELECT f.friend_id, fs.status " +
