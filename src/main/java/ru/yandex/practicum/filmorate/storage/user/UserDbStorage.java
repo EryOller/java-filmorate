@@ -77,9 +77,8 @@ public class UserDbStorage implements UserStorage {
                     Arrays.stream(StatusFrindship.values())
                     .filter(s -> s.getStatus().equals(statusFriendshipRows.getString("STATUS")))
                     .findFirst()
-                    .get())  ;
+                    .get());
         }
-
         String sqlGetFriendsFirstQuery = "INSERT INTO friends (user_id, friend_id, friendship_id) VALUES";
         String sqlGetFrindsSumValues = "";
         int countValues = user.getListFriends().size();
@@ -87,15 +86,13 @@ public class UserDbStorage implements UserStorage {
         // формирование большого инсерта и формирование мапы
         while (countIteration <= countValues) {
             sqlGetFrindsSumValues = sqlGetFrindsSumValues +
-                    " (:userId, :friendId" + countIteration + ", :friendshipId" + countIteration +")";
-
+                    " (:userId, :friendId" + countIteration + ", :friendshipId" + countIteration + ")";
             countIteration++;
             if (countIteration <= countValues) {
                 sqlGetFrindsSumValues = sqlGetFrindsSumValues + " ,";
             } else {
                 sqlGetFrindsSumValues = sqlGetFrindsSumValues + ";";
             }
-
         }
         final String sqlInsertFullFriendsByUser = sqlGetFriendsFirstQuery + sqlGetFrindsSumValues;
         MapSqlParameterSource map = new MapSqlParameterSource();
@@ -140,7 +137,6 @@ public class UserDbStorage implements UserStorage {
                                     .findFirst()
                                     .get()));
         }
-
         for (User user : users) {
             makeFriends(usersAndFriends, user);
         }
