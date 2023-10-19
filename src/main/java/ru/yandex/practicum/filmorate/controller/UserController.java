@@ -80,8 +80,6 @@ public class UserController {
             User initiator = userStorage.getUserFromStorageById(Long.valueOf(pathVarsMap.get("id")));
             User permissive = userStorage.getUserFromStorageById(Long.valueOf(pathVarsMap.get("friendId")));
             userService.makeFriends(initiator, permissive);
-            userStorage.update(initiator);
-            userStorage.update(permissive);
             log.info("Пользователи подружились");
         } else {
             log.debug("Пользователь с id " + pathVarsMap.get("id") + " или "
@@ -125,9 +123,8 @@ public class UserController {
     public ResponseEntity<List<User>> getListFriendsByUserId(@PathVariable String id) {
         log.debug("Вызов get метода для получения списка друзей");
         if (userStorage.hasKeyInStorage(Long.valueOf(id))) {
-            List<User> friends = userService.getListFriends(userStorage.getUserFromStorageById(Long.valueOf(id)),
-                    userStorage);
-            return new ResponseEntity<>(friends, HttpStatus.OK);
+            return new ResponseEntity<>(userService.getListFriends(userStorage.getUserFromStorageById(Long.valueOf(id)),
+                    userStorage), HttpStatus.OK);
         } else {
             throw new EntityNotFoundException("Пользователь с идентификатором " + id + " не найден");
         }

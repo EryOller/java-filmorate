@@ -64,55 +64,91 @@ public class UserDbStorage implements UserStorage {
                 "WHERE user_id = :userId;";
         final String sqlUpdateUserFieldEmail = "UPDATE users SET email = :email " +
                 "WHERE user_id = :userId;";
-        final String sqlUpdateFilmFieldDuration = "UPDATE users SET birthday = :birthday " +
+        final String sqlUpdateUserFieldBirthday = "UPDATE users SET birthday = :birthday " +
                 "WHERE user_id = :userId;";
         final String sqlDeleteFriendsByUserId = "DELETE FROM friends WHERE user_id = :userId;";
-        final String sqlFriendshipId = "SELECT friendship_id FROM friendship WHERE status = :status;";
-        // Заполнение таблицу с друзьями пользователя
-        final String sqlFriends = "INSERT INTO friends (user_id, friend_id, friendship_id) " +
-                "VALUES (:userId, :friend_Id, :friendshipId);";
+        namedParameterJdbcOperations.update(sqlDeleteFriendsByUserId, Map.of("userId", user.getId()));
+        Map<Integer, StatusFrindship> statusFriendships = new HashMap();
+// получение списка статусов
+        final String sqlGetFriendship = "SELECT friendship_id, status FROM friendship;";
+        SqlRowSet statusFriendshipRows = jdbcTemplate.queryForRowSet(sqlGetFriendship);
+        while (statusFriendshipRows.next()) {
+            statusFriendships.put(statusFriendshipRows.getInt("FRIENDSHIP_ID"),
+                    Arrays.stream(StatusFrindship.values())
+                    .filter(s -> s.getStatus().equals(statusFriendshipRows.getString("STATUS")))
+                    .findFirst()
+                    .get())  ;
+        }
+
+        String sqlGetFriendsFirstQuery = "INSERT INTO friends (user_id, friend_id, friendship_id) VALUES";
+        String sqlGetFrindsSumValues = "";
+        int countValues = user.getListFriends().size();
+        int countIteration = 1;
+        // формирование большого инсерта и формирование мапы
+        while (countIteration <= countValues) {
+            sqlGetFrindsSumValues = sqlGetFrindsSumValues +
+                    " (:userId, :friendId" + countIteration + ", :friendshipId" + countIteration +")";
+
+            countIteration++;
+            if (countIteration <= countValues) {
+                sqlGetFrindsSumValues = sqlGetFrindsSumValues + " ,";
+            } else {
+                sqlGetFrindsSumValues = sqlGetFrindsSumValues + ";";
+            }
+
+        }
+        final String sqlInsertFullFriendsByUser = sqlGetFriendsFirstQuery + sqlGetFrindsSumValues;
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("userId", user.getId());
+        int count = 1;
+        for (Friendship friend : user.getListFriends()) {
+            map.addValue("friendId" + count, friend.getUser());
+            map.addValue("friendshipId" + count, statusFriendships.keySet()
+                    .stream().filter(s -> statusFriendships.get(s).getStatus().equals(friend.getStatus().getStatus()))
+                    .findFirst()
+                    .get());
+            count++;
+        }
+        if (user.getListFriends().size() != 0) {
+            namedParameterJdbcOperations.update(sqlInsertFullFriendsByUser, map);
+        }
         namedParameterJdbcOperations.update(sqlUpdateUserFieldLogin,
                 Map.of("login", user.getLogin(), "userId", user.getId()));
         namedParameterJdbcOperations.update(sqlUpdateUserFieldName,
                 Map.of("name", user.getName(), "userId", user.getId()));
         namedParameterJdbcOperations.update(sqlUpdateUserFieldEmail,
                 Map.of("email", user.getEmail(), "userId", user.getId()));
-        namedParameterJdbcOperations.update(sqlUpdateFilmFieldDuration, Map.of("birthday", user.getBirthday(),
+        namedParameterJdbcOperations.update(sqlUpdateUserFieldBirthday, Map.of("birthday", user.getBirthday(),
                 "userId", user.getId()));
-        namedParameterJdbcOperations.update(sqlDeleteFriendsByUserId, Map.of("userId", user.getId()));
-        SqlRowSet friendsStatusRows;
-        for (Friendship friendship : user.getListFriends()) {
-            friendsStatusRows = namedParameterJdbcOperations.queryForRowSet(sqlFriendshipId,
-                    Map.of("status", friendship.getStatus().getStatus()));
-            friendsStatusRows.next();
-            namedParameterJdbcOperations.update(sqlFriends, Map.of("userId",  user.getId(),
-                    "friend_Id", friendship.getUser(),
-                    "friendshipId", friendsStatusRows.getString("FRIENDSHIP_ID")));
-        }
         return user;
     }
 
     @Override
     public List<User> getUsers() {
         List<User> users;
-        SqlRowSet friendsByUserId;
-
+        List<Friendship> usersAndFriends = new ArrayList<>();
         final String sqlGetUsers = "SELECT user_id, login, name, email, birthday FROM users";
-        final String sqlGetFriendsByUserId = "SELECT f.friend_id, fs.status " +
-                "FROM friends AS f LEFT OUTER JOIN friendship AS fs ON f.friendship_id = fs.friendship_id " +
-                "WHERE user_id = :userId;";
+        final String sqlGetFriendsAllUsers = "SELECT f.user_id, f.friend_id, fs.status " +
+                "FROM friends AS f LEFT OUTER JOIN friendship AS fs ON f.friendship_id = fs.friendship_id;";
+        SqlRowSet friendsAllUsersRows = jdbcTemplate.queryForRowSet(sqlGetFriendsAllUsers);
         SqlRowSet usersRows = jdbcTemplate.queryForRowSet(sqlGetUsers);
         users = makeListUsers(usersRows);
+        while (friendsAllUsersRows.next()) {
+            usersAndFriends.add(new Friendship(friendsAllUsersRows.getLong("FRIEND_ID"),
+                            Arrays.stream(StatusFrindship.values())
+                                    .filter(s -> s.getStatus().equals(friendsAllUsersRows.getString("STATUS")))
+                                    .findFirst()
+                                    .get()));
+        }
+
         for (User user : users) {
-            friendsByUserId = namedParameterJdbcOperations.queryForRowSet(sqlGetFriendsByUserId, Map.of("userId", user.getId()));
-            makeFriends(friendsByUserId, user);
+            makeFriends(usersAndFriends, user);
         }
         return users;
     }
 
     @Override
     public boolean hasKeyInStorage(Long id) {
-
         final String sqlGetUserById = "SELECT user_id FROM users WHERE user_id = :userId";
         SqlRowSet hasUser = namedParameterJdbcOperations.queryForRowSet(sqlGetUserById, Map.of("userId", id));
         return hasUser.next();
@@ -121,25 +157,35 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User getUserFromStorageById(Long id) {
         User user = null;
+        List<Friendship> usersAndFriends = new ArrayList<>();
         final String sqlGetUserById = "SELECT user_id, login, name, email, birthday " +
                 "FROM users WHERE user_id = :userId;";
         final String sqlGetFriendsByUserId = "SELECT f.friend_id, fs.status FROM friends AS f " +
                 "LEFT OUTER JOIN friendship AS fs ON f.friendship_id = fs.friendship_id " +
                 "WHERE user_id = :userId;";
-
+        final String sqlGetFriendsAllUsers = "SELECT f.user_id, f.friend_id, fs.status " +
+                "FROM friends AS f LEFT OUTER JOIN friendship AS fs ON f.friendship_id = fs.friendship_id;";
+        SqlRowSet friendsAllUsersRows = jdbcTemplate.queryForRowSet(sqlGetFriendsAllUsers);
         SqlRowSet userRows = namedParameterJdbcOperations.queryForRowSet(sqlGetUserById, Map.of("userId", id));
-        SqlRowSet friendsUserByUserId = namedParameterJdbcOperations.queryForRowSet(sqlGetFriendsByUserId, Map.of("userId", id));
-
         List<User> users = makeListUsers(userRows);
         user = users.get(users.size() - 1);
-        user.setFriends(makeFriends(friendsUserByUserId, user));
+        while (friendsAllUsersRows.next()) {
+            if (id == friendsAllUsersRows.getLong("USER_ID")) {
+                usersAndFriends.add(new Friendship(friendsAllUsersRows.getLong("FRIEND_ID"),
+                                Arrays.stream(StatusFrindship.values())
+                                        .filter(s -> s.getStatus().equals(friendsAllUsersRows.getString("STATUS")))
+                                        .findFirst()
+                                        .get()));
+            }
+
+        }
+        user.setFriends(makeFriends(usersAndFriends, user));
         return user;
     }
 
     private static List<User> makeListUsers(SqlRowSet userResultSet) {
         User user;
         List<User> users = new ArrayList<>();
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-d");
         while (userResultSet.next()) {
             user = new User(userResultSet.getString("EMAIL"), userResultSet.getString("LOGIN"),
@@ -151,14 +197,10 @@ public class UserDbStorage implements UserStorage {
         return users;
     }
 
-    private static Set<Friendship> makeFriends(SqlRowSet friendsByUserResultSet, User user) {
+    private static Set<Friendship> makeFriends(List<Friendship> usersAndFriends, User user) {
         Set<Friendship> friends = new HashSet<>();
-        while (friendsByUserResultSet.next()) {
-            friends.add(new Friendship(friendsByUserResultSet.getLong("FRIEND_ID"),
-                    Arrays.stream(StatusFrindship.values())
-                            .filter(s -> s.getStatus().equals(friendsByUserResultSet.getString("STATUS")))
-                            .findFirst()
-                            .get()));
+        for (Friendship friend : usersAndFriends) {
+            friends.add(friend);
         }
         user.setFriends(friends);
         return friends;
