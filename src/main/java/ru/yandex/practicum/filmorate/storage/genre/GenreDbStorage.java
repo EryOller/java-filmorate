@@ -15,7 +15,6 @@ public class GenreDbStorage implements GenreStorage {
     private final NamedParameterJdbcOperations namedParameterJdbcOperations;
     private final JdbcTemplate jdbcTemplate;
 
-
     public GenreDbStorage(NamedParameterJdbcOperations namedParameterJdbcOperations, JdbcTemplate jdbcTemplate) {
         this.namedParameterJdbcOperations = namedParameterJdbcOperations;
         this.jdbcTemplate = jdbcTemplate;
@@ -42,8 +41,7 @@ public class GenreDbStorage implements GenreStorage {
     public Genre getGenreFromStorageById(int id) {
         final String sqlGetGenreById = "SELECT genre_id, name FROM genre WHERE genre_id = :genreId;";
         SqlRowSet genreRows = namedParameterJdbcOperations.queryForRowSet(sqlGetGenreById, Map.of("genreId", id));
-        List<Genre> genres = makeListGenres(genreRows);
-        return genres.get(genres.size() - 1);
+        return makeGenre(genreRows);
     }
 
     private static List<Genre> makeListGenres(SqlRowSet genreResultSet) {
@@ -55,6 +53,14 @@ public class GenreDbStorage implements GenreStorage {
             genres.add(genre);
         }
         return genres;
+    }
+
+    private static Genre makeGenre(SqlRowSet genreResultSet) {
+        Genre genre =  null;
+        while (genreResultSet.next()) {
+            genre = new Genre(genreResultSet.getInt("GENRE_ID"), genreResultSet.getString("NAME"));
+        }
+        return genre;
     }
 
 }
