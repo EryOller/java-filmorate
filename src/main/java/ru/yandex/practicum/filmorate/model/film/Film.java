@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.model.film;
 
 
 import lombok.Data;
@@ -29,6 +29,9 @@ public class Film {
     @Positive(message = "Продолжительность фильма может быть только положительным значением")
     private int duration;
     private Set<Long> likesByUsers = new HashSet<>();
+    private Set<Genre> genres;
+    private Mpa mpa;
+
 
     @Override
     public boolean equals(Object o) {
